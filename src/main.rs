@@ -1,5 +1,7 @@
 use std::env;
 
+mod strip;
+
 fn main() {
     let args: Vec<String> = env::args().collect();
 
@@ -19,9 +21,10 @@ fn main() {
     let filetype: String = filename_split[filename_split.len() - 1].to_owned();
 
     // TODO: replace println!() with function calls for respective filetype (need to be implemented)
+    // determine if or (||) is possible in match statements
     match filetype.as_str() {
-        "txt" => println!("txt"),
-        "csv" => println!("csv"),
-        _ => println!("File type not currently supported."),
+        "txt" => crate::strip::txt_gen(filename, filetype),
+        "csv" => crate::strip::csv_gen(filename, filetype),
+        _ => println!("File type may not be recognized or supported (currently)."),
     }
 }
