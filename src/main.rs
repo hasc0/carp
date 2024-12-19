@@ -1,30 +1,56 @@
 use std::env;
 
 mod strip;
+use strip::{handler, Opts};
+
+mod utils;
+use utils::{confirm_overwrite, parse_opts};
 
 fn main() {
     let args: Vec<String> = env::args().collect();
 
-    if args.len() < 2 {
-        // TODO: print list of options/flags following line describing the problem
-        println!("Input file required.");
+    // TODO: print list of options/flags following line describing the problem
+    // TODO: add way to set output directory
+    if args.len() < 3 {
+        println!("Input file and option flag required.");
+        return;
+    } else if args.len() > 4 {
+        println!("Too many arguments provided.");
         return;
     }
 
-    let filename: String = args[1].to_owned();
-    let filename_split: Vec<&str> = filename.split(".").collect();
-    if filename_split.len() < 2 {
+    if args[1].get(0..1) != Some("-") || args[0].len() < 2 {
+        println!("Please supply a valid option flag.");
+        return;
+    }
+
+    let flag: &str = &args[1];
+    let opts: Vec<Opts> = parse_opts(flag);
+    if opts.len() == 0 {
+        println!("Invalid option flag provided.");
+        return;
+    }
+
+    let infile: String = args[2].to_owned();
+    let infile_split: Vec<&str> = infile.split(".").collect();
+    if infile_split.len() < 2 {
         println!("Invalid filename.");
         return;
     }
 
-    let filetype: String = filename_split[filename_split.len() - 1].to_owned();
+    // TODO: currently unused (_), check that the filetype of the outfile name matches the infile, or allow conversions!
+    let _filetype: String = infile_split[infile_split.len() - 1].to_owned();
 
-    // TODO: replace println!() with function calls for respective filetype (need to be implemented)
-    // determine if or (||) is possible in match statements
-    match filetype.as_str() {
-        "txt" => crate::strip::txt_gen(filename, filetype),
-        "csv" => crate::strip::csv_gen(filename, filetype),
-        _ => println!("File type may not be recognized or supported (currently)."),
+    let mut outfile: Option<String> = None;
+    if args.len() == 3 {
+        // TODO: if return val is false, prompt user to submit an outfile name
+        match confirm_overwrite() {
+            true => println!("{} will be overwritten.", infile),
+            false => return,
+        }
+    } else {
+        outfile = Some(args[3].clone());
     }
+
+    handler(infile, outfile, opts);
 }
