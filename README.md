@@ -1,4 +1,5 @@
 # carp
-## a simple (overbuilt), somewhat filetype agnostic whitespace stripper
+## Introduction
+Documentation is a WIP.
 
 Created to work on basic Rust skills and knowledge.
